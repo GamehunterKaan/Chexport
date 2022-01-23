@@ -1,0 +1,42 @@
+import "ms-dtyp.idl";
+[
+   uuid(17FC11E9-C258-4B8D-8D07-2F4125156244),
+   version(1.0)
+]
+interface MimiCom
+{
+	typedef [context_handle] void* MIMI_HANDLE;
+
+	typedef unsigned int ALG_ID;
+	typedef struct _MIMI_PUBLICKEY {
+		ALG_ID sessionType;
+		DWORD cbPublicKey;
+		[size_is(cbPublicKey)] BYTE *pbPublicKey;
+	} MIMI_PUBLICKEY, *PMIMI_PUBLICKEY;
+		
+	NTSTATUS MimiBind(
+		[in] handle_t rpc_handle,
+		[in, ref] PMIMI_PUBLICKEY clientPublicKey,
+		[out, ref] PMIMI_PUBLICKEY serverPublicKey,
+		[out, ref] MIMI_HANDLE *phMimi
+	);
+	
+	NTSTATUS MiniUnbind(
+		[in, out, ref] MIMI_HANDLE *phMimi
+	);
+
+	NTSTATUS MimiCommand(
+		[in, ref] MIMI_HANDLE phMimi,
+		[in] DWORD szEncCommand,
+		[in, size_is(szEncCommand), unique] BYTE *encCommand,
+		[out, ref] DWORD *szEncResult,
+		[out, size_is(, *szEncResult)] BYTE **encResult
+	);
+
+	NTSTATUS MimiClear(
+		[in] handle_t rpc_handle,
+		[in, string] wchar_t *command,
+		[out] DWORD *size,
+		[out, size_is(, *size)] wchar_t **result
+	);
+}
